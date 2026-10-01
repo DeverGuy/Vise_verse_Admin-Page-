@@ -9,7 +9,7 @@ export default function Sidebar() {
         <div className="logo-container">
           <img src="/Vice_verse_logo.png" alt="Vice Verse Logo" style={{ width: '80px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255, 0, 127, 0.4))' }} />
           <div>
-            <h2 className="logo-text">Vice Verse Admin</h2>
+            <h2 className="logo-text animate-flicker" style={{ color: 'var(--text-primary)' }}>Vice Verse Admin</h2>
             <p className="logo-subtext">Version 1.0</p>
           </div>
         </div>
