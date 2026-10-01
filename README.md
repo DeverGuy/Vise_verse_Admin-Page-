@@ -1,6 +1,17 @@
-# 🌴 Vice Verse Admin Portal (Version 1.0)
+<div align="center">
+  <img src="public/Vice_verse_logo.png" alt="Vice Verse Logo" width="250" />
+  <h1>🌴 Vice Verse Admin Portal (Version 1.0) 🌴</h1>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Theme-Vice%20City-FF007F?style=for-the-badge&logo=rockstargames&logoColor=white" alt="Theme" />
+    <img src="https://img.shields.io/badge/Framework-React%2018-00F0FF?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+    <img src="https://img.shields.io/badge/Event-Ideathon%202026-FBC815?style=for-the-badge&logo=v&logoColor=black" alt="Event" />
+  </p>
 
-Welcome to the **Vice Verse Admin Portal** - the central administrative hub for the Vice Verse 2026 Ideathon. Built with a sleek, vibrant, **GTA Vice City-inspired aesthetic**, this dashboard provides all the necessary tools to manage the event seamlessly.
+  <p><em>The central administrative hub for the Vice Verse 2026 Ideathon.</em></p>
+</div>
+
+Built with a sleek, vibrant, **GTA Vice City-inspired aesthetic**, this dashboard provides all the necessary tools to manage the event seamlessly.
 
 ## ✨ Features
 
