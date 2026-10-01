@@ -1,6 +1,9 @@
 <div align="center">
   <img src="public/Vice_verse_logo.png" alt="Vice Verse Logo" width="250" />
   <h1>🌴 VICE VERSE : MISSION CONTROL 🌴</h1>
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Courier+New&weight=800&size=24&duration=3000&pause=1000&color=FBC815&center=true&vCenter=true&width=600&lines=Welcome+to+Vice+City;Mission+Control+is+Online;Ideathon+2026+Initiated" alt="Typing SVG" />
+  </a>
   
   <p>
     <img src="https://img.shields.io/badge/Theme-Vice%20City-FF007F?style=for-the-badge&logo=rockstargames&logoColor=white" alt="Theme" />
