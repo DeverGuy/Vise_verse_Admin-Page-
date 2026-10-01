@@ -1,15 +1,64 @@
-import React from 'react';
-import { Search, Plus, UserPlus, Edit3, Trash2 } from 'lucide-react';
+import React, { useContext, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Search, Plus, Edit3, Trash2, X } from 'lucide-react';
+import { DataContext } from './DataContext';
 
 export default function JudgesPortal() {
+  const { judges, addJudge, editJudge, deleteJudge, teams } = useContext(DataContext);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentJudge, setCurrentJudge] = useState(null);
+  
+  const [formData, setFormData] = useState({ name: '', email: '', specialization: '' });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsModalOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleOpenModal = (judge = null) => {
+    if (judge) {
+      setCurrentJudge(judge);
+      setFormData({ name: judge.name, email: judge.email, specialization: judge.specialization });
+    } else {
+      setCurrentJudge(null);
+      setFormData({ name: '', email: '', specialization: '' });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (currentJudge) {
+      editJudge(currentJudge.id, formData);
+    } else {
+      addJudge({
+        ...formData,
+        initials: formData.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+        theme: `var(--accent-${['primary', 'secondary', 'tertiary'][Math.floor(Math.random() * 3)]})`
+      });
+    }
+    setIsModalOpen(false);
+  };
+
+  const filteredJudges = judges.filter(j => 
+    j.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    j.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="animate-fade-in">
-      <header className="page-header">
+    <>
+      <div className="animate-fade-in" style={{ position: 'relative' }}>
+        <header className="page-header">
         <div>
           <h1 className="text-gradient">Judges Control Portal</h1>
           <p>Manage judging panels, scorecards, and evaluations.</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => handleOpenModal()}>
           <Plus size={18} /> Add Judge
         </button>
       </header>
@@ -21,6 +70,8 @@ export default function JudgesPortal() {
             <input 
               type="text" 
               placeholder="Search judges..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 background: 'var(--bg-color)', 
                 border: '1px solid var(--border-color)', 
@@ -32,7 +83,6 @@ export default function JudgesPortal() {
               }} 
             />
           </div>
-          <button className="btn btn-outline">Filter</button>
         </div>
       </div>
 
@@ -43,60 +93,72 @@ export default function JudgesPortal() {
               <th>Judge Name</th>
               <th>Specialization</th>
               <th>Teams Assigned</th>
-              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                  <div style={{width: '40px', height: '40px', borderRadius: '4px', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#000'}}>
-                    DS
-                  </div>
-                  <div>
-                    <div style={{fontWeight: '500'}}>Dr. Smith</div>
-                    <div style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>dr.smith@example.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>AI & Machine Learning</td>
-              <td>5 / 5</td>
-              <td><span className="badge badge-success">Online</span></td>
-              <td>
-                <div style={{display: 'flex', gap: '8px'}}>
-                  <button className="btn btn-outline" style={{padding: '6px'}} title="Add/Assign"><UserPlus size={16} /></button>
-                  <button className="btn btn-outline" style={{padding: '6px'}} title="Edit Details"><Edit3 size={16} /></button>
-                  <button className="btn btn-outline" style={{padding: '6px', color: 'var(--status-error)', borderColor: 'var(--status-error)'}} title="Delete"><Trash2 size={16} /></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                  <div style={{width: '40px', height: '40px', borderRadius: '4px', background: 'linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#000'}}>
-                    JW
-                  </div>
-                  <div>
-                    <div style={{fontWeight: '500'}}>Jane Williams</div>
-                    <div style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>jane.w@example.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>Web3 & Blockchain</td>
-              <td>2 / 5</td>
-              <td><span className="badge badge-warning">Evaluating</span></td>
-              <td>
-                <div style={{display: 'flex', gap: '8px'}}>
-                  <button className="btn btn-outline" style={{padding: '6px'}} title="Add/Assign"><UserPlus size={16} /></button>
-                  <button className="btn btn-outline" style={{padding: '6px'}} title="Edit Details"><Edit3 size={16} /></button>
-                  <button className="btn btn-outline" style={{padding: '6px', color: 'var(--status-error)', borderColor: 'var(--status-error)'}} title="Delete"><Trash2 size={16} /></button>
-                </div>
-              </td>
-            </tr>
+            {filteredJudges.map(judge => {
+              const assignedCount = teams.filter(t => t.judgeId === judge.id).length;
+              return (
+                <tr key={judge.id}>
+                  <td>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+                      <div style={{width: '40px', height: '40px', borderRadius: '4px', background: `linear-gradient(135deg, ${judge.theme}, var(--bg-color))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#fff'}}>
+                        {judge.initials}
+                      </div>
+                      <div>
+                        <div style={{fontWeight: '500'}}>{judge.name}</div>
+                        <div style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>{judge.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{judge.specialization}</td>
+                  <td>{assignedCount} Teams</td>
+                  <td>
+                    <div style={{display: 'flex', gap: '8px'}}>
+                      <button className="btn btn-outline" style={{padding: '6px'}} title="Edit Details" onClick={() => handleOpenModal(judge)}><Edit3 size={16} /></button>
+                      <button className="btn btn-outline" style={{padding: '6px', color: 'var(--status-error)', borderColor: 'var(--status-error)'}} title="Delete" onClick={() => deleteJudge(judge.id)}><Trash2 size={16} /></button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+            {filteredJudges.length === 0 && (
+              <tr>
+                <td colSpan="4" style={{textAlign: 'center', color: 'var(--text-secondary)', padding: '24px'}}>No judges found.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+
+      {isModalOpen && createPortal(
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button type="button" className="modal-close" onClick={() => setIsModalOpen(false)}>
+              <X size={18} />
+            </button>
+            <h2 style={{marginBottom: '24px', color: 'var(--accent-primary)'}}>{currentJudge ? 'Edit Judge' : 'Add Judge'}</h2>
+            <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                <label style={{fontSize: '0.9rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontFamily: 'var(--font-family-tech)'}}>Name</label>
+                <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={{background: 'rgba(13,13,20,0.7)', border: '1px solid var(--border-color)', color: '#fff', padding: '12px', borderRadius: '4px'}} />
+              </div>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                <label style={{fontSize: '0.9rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontFamily: 'var(--font-family-tech)'}}>Email</label>
+                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} style={{background: 'rgba(13,13,20,0.7)', border: '1px solid var(--border-color)', color: '#fff', padding: '12px', borderRadius: '4px'}} />
+              </div>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                <label style={{fontSize: '0.9rem', color: 'var(--accent-primary)', textTransform: 'uppercase', fontFamily: 'var(--font-family-tech)'}}>Specialization</label>
+                <input required type="text" value={formData.specialization} onChange={e => setFormData({...formData, specialization: e.target.value})} style={{background: 'rgba(13,13,20,0.7)', border: '1px solid var(--border-color)', color: '#fff', padding: '12px', borderRadius: '4px'}} />
+              </div>
+              <button type="submit" className="btn btn-primary" style={{marginTop: '16px'}}>{currentJudge ? 'Update Judge' : 'Add Judge'}</button>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }

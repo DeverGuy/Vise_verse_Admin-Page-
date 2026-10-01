@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Users, Gavel, CalendarCheck, Zap } from 'lucide-react';
+import { DataContext } from './DataContext';
 import './Dashboard.css';
 
 export default function Dashboard() {
+  const { teams, judges } = useContext(DataContext);
+
   return (
     <div className="dashboard animate-fade-in">
       <header className="page-header">
         <div>
-          <h1 className="text-gradient">Ideathon Dashboard</h1>
-          <p>Welcome to the central command center for the IVC × InUnity Ideathon.</p>
+          <h1 className="text-gradient">Vice Verse Dashboard</h1>
+          <p>Welcome to the central command center for Vice Verse 1.0 2026.</p>
         </div>
         <button className="btn btn-primary">
           <Zap size={18} /> Quick Action
@@ -21,7 +24,7 @@ export default function Dashboard() {
             <Users size={24} />
           </div>
           <div className="stat-content">
-            <h3>240</h3>
+            <h3>{teams.length * 3}</h3>
             <p>Total Participants</p>
           </div>
         </div>
@@ -31,49 +34,52 @@ export default function Dashboard() {
             <Gavel size={24} />
           </div>
           <div className="stat-content">
-            <h3>12</h3>
+            <h3>{judges.length}</h3>
             <p>Active Judges</p>
           </div>
         </div>
 
-        <div className="card stat-card animate-fade-in animate-delay-3">
-          <div className="stat-icon-wrapper" style={{background: 'rgba(0, 240, 255, 0.1)', color: 'var(--accent-tertiary)'}}>
-            <CalendarCheck size={24} />
-          </div>
-          <div className="stat-content">
-            <h3>Day 1</h3>
-            <p>Current Event Stage</p>
-          </div>
-        </div>
+
       </div>
 
       <div className="recent-activity-section mt-8 animate-fade-in animate-delay-3">
-        <h2 className="section-title">Recent Activity</h2>
+        <h2 className="section-title">Active Judges Panel</h2>
         <div className="glass-panel" style={{padding: '0'}}>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Time</th>
-                <th>Event</th>
+                <th>Judge</th>
+                <th>Specialization</th>
+                <th>Assigned Teams</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>10:00 AM</td>
-                <td>Team Alpha submitted prototype</td>
-                <td><span className="badge badge-success">Reviewed</span></td>
-              </tr>
-              <tr>
-                <td>09:45 AM</td>
-                <td>Judge 'Dr. Smith' logged in</td>
-                <td><span className="badge badge-neutral">Log</span></td>
-              </tr>
-              <tr>
-                <td>09:15 AM</td>
-                <td>Team Beta requested mentor assistance</td>
-                <td><span className="badge badge-warning">Pending</span></td>
-              </tr>
+              {judges.map(judge => {
+                const assignedCount = teams.filter(t => t.judgeId === judge.id).length;
+                return (
+                  <tr key={judge.id}>
+                    <td>
+                      <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+                        <div style={{width: '32px', height: '32px', borderRadius: '4px', background: `linear-gradient(135deg, ${judge.theme}, var(--bg-color))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#fff'}}>
+                          {judge.initials}
+                        </div>
+                        <div>
+                          <div style={{fontWeight: '500'}}>{judge.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{judge.specialization}</td>
+                    <td>{assignedCount}</td>
+                    <td><span className="badge badge-success">Online</span></td>
+                  </tr>
+                );
+              })}
+              {judges.length === 0 && (
+                <tr>
+                  <td colSpan="4" style={{textAlign: 'center', color: 'var(--text-secondary)'}}>No judges currently active.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

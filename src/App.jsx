@@ -4,24 +4,29 @@ import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
 import JudgesPortal from './JudgesPortal';
 import ParticipantsPortal from './ParticipantsPortal';
+import { DataProvider } from './DataContext';
 import EventFlow from './EventFlow';
+import EventDetails from './EventDetails';
 import './index.css';
 
 function App() {
   return (
-    <Router>
-      <div className="app-container">
-        <Sidebar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/judges" element={<JudgesPortal />} />
-            <Route path="/participants" element={<ParticipantsPortal />} />
-            <Route path="/event-flow" element={<EventFlow />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <DataProvider>
+      <Router>
+        <div className="app-container">
+          <Sidebar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/judges" element={<JudgesPortal />} />
+              <Route path="/participants" element={<ParticipantsPortal />} />
+              <Route path="/event-flow" element={<EventFlow />} />
+              <Route path="/event-details" element={<EventDetails />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </DataProvider>
   );
 }
 
