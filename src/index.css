@@ -24,9 +24,9 @@
   --status-warning: #FBC815;
   --status-error: #FF007F;
 
-  --font-family-body: 'Pricedown', 'Inter', sans-serif;
+  --font-family-body: 'Inter', sans-serif;
   --font-family-heading: 'Pricedown', 'Bebas Neue', sans-serif;
-  --font-family-tech: 'Pricedown', 'Chakra Petch', sans-serif;
+  --font-family-tech: 'Chakra Petch', sans-serif;
 }
 
 * {
@@ -41,9 +41,6 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-  font-size: 1.25rem;
-  letter-spacing: 1.5px;
-  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
 }
 
 ::-webkit-scrollbar {
@@ -226,8 +223,46 @@ p {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes neonFlicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    text-shadow: 2px 2px 0px rgba(0,0,0,1), 0 0 10px var(--accent-secondary), 0 0 20px var(--accent-secondary);
+  }
+  20%, 24%, 55% {
+    opacity: 0.5;
+    text-shadow: none;
+  }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 5px var(--accent-primary); }
+  50% { box-shadow: 0 0 20px var(--accent-primary), 0 0 30px var(--accent-primary); }
+  100% { box-shadow: 0 0 5px var(--accent-primary); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.4s ease forwards;
+}
+
+.animate-flicker {
+  animation: neonFlicker 3s infinite alternate;
+}
+
+.animate-glow {
+  animation: pulseGlow 3s infinite;
+}
+
+.nav-item.active {
+  animation: pulseGlow 4s infinite;
+}
+
+.btn-primary {
+  animation: pulseGlow 2s infinite;
 }
 
 .animate-delay-1 { animation-delay: 0.1s; }
