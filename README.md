@@ -14,7 +14,9 @@
   <p><em>"Look man, I just need a dashboard that works." — The central administrative hub for the Vice Verse 2026 Ideathon.</em></p>
 </div>
 
----
+<div align="center">
+  <img src="neon-divider.svg" width="100%" />
+</div>
 
 > Welcome to Vice City, where the neon lights never fade and the hacking never stops. This is the **Vice Verse Admin Portal**, built with a sleek, vibrant, **GTA-inspired aesthetic**. It provides all the necessary tools to manage the underworld of the Ideathon seamlessly.
 
@@ -80,5 +82,9 @@ The application utilizes a custom CSS variable system defined in `index.css`:
   - `var(--accent-secondary)`: `#FF007F` (Neon Pink)
   - `var(--accent-tertiary)`: `#00F0FF` (Ocean Drive Cyan)
 
----
+<div align="center">
+  <img src="neon-divider.svg" width="100%" />
+  <img src="synthwave-sun.svg" width="150" />
+</div>
+
 *Forged for the IVC Ideathon @ Vidyavardhaka College of Engineering (VVCE).*
