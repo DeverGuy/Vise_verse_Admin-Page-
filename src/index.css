@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap');
 
 @font-face {
   font-family: 'Pricedown';
@@ -24,9 +24,9 @@
   --status-warning: #FBC815;
   --status-error: #FF007F;
 
-  --font-family-body: 'Inter', sans-serif;
-  --font-family-heading: 'Pricedown', 'Bebas Neue', sans-serif;
-  --font-family-tech: 'Chakra Petch', sans-serif;
+  --font-family-body: 'Rajdhani', sans-serif;
+  --font-family-heading: 'Orbitron', sans-serif;
+  --font-family-tech: 'Share Tech Mono', monospace;
 }
 
 * {
@@ -149,16 +149,15 @@ body {
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5em;
   font-family: var(--font-family-heading);
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   line-height: 1.1;
   text-transform: uppercase;
-  -webkit-text-stroke: 1px #000;
-  text-shadow: 3px 3px 0px rgba(0,0,0,1);
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.8), 0 0 10px rgba(251, 200, 21, 0.2);
 }
 
-h1 { font-size: 3.5rem; }
-h2 { font-size: 2.5rem; }
-h3 { font-size: 1.8rem; }
+h1 { font-size: 3rem; }
+h2 { font-size: 2.2rem; }
+h3 { font-size: 1.6rem; }
 
 .text-gradient {
   color: var(--text-primary);
