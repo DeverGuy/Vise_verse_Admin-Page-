@@ -1,90 +1,36 @@
-<div align="center">
-  <img src="public/Vice_verse_logo.png" alt="Vice Verse Logo" width="250" />
-  <h1>🌴 VICE VERSE : MISSION CONTROL 🌴</h1>
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Courier+New&weight=800&size=24&duration=3000&pause=1000&color=FBC815&center=true&vCenter=true&width=600&lines=Welcome+to+Vice+City;Mission+Control+is+Online;Ideathon+2026+Initiated" alt="Typing SVG" />
-  </a>
-  
-  <p>
-    <img src="https://img.shields.io/badge/Theme-Vice%20City-FF007F?style=for-the-badge&logo=rockstargames&logoColor=white" alt="Theme" />
-    <img src="https://img.shields.io/badge/Arsenal-React%2018-00F0FF?style=for-the-badge&logo=react&logoColor=black" alt="React" />
-    <img src="https://img.shields.io/badge/Event-Ideathon%202026-FBC815?style=for-the-badge&logo=v&logoColor=black" alt="Event" />
-  </p>
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-  <p><em>"Look man, I just need a dashboard that works." — The central administrative hub for the Vice Verse 2026 Ideathon.</em></p>
-</div>
+## Getting Started
 
-<div align="center">
-  <img src="neon-divider.svg" width="100%" />
-</div>
+First, run the development server:
 
-> Welcome to Vice City, where the neon lights never fade and the hacking never stops. This is the **Vice Verse Admin Portal**, built with a sleek, vibrant, **GTA-inspired aesthetic**. It provides all the necessary tools to manage the underworld of the Ideathon seamlessly.
-
-## 🚗 Mission Objectives (Features)
-
-- 🌃 **Vice City Aesthetic**: High contrast dark-mode UI dripping with neon accents (Rockstar Yellow, Neon Pink, Neon Cyan). Complete with glassmorphism effects and the iconic `Pricedown` GTA font for heavy, criminal typography.
-- 📅 **Event Flow Tracker**: A real-time tracker to monitor the heist... I mean, the Ideathon schedule (Check-in, Keynote, Hacking, Judging).
-- 👨‍⚖️ **Judges Syndicate Portal**: A dedicated scoring interface for tracking team progress, reviewing pitches, and assigning points to the real players.
-- 👥 **Participants Roster**: Administrative view of all registered hackers, team formations, and live street status.
-- 📍 **Safehouse Details**: Core information tracking for the Ideathon (Venue: *Sri H. Kempegowda Indoor Sports Complex*, Date: *26th October 2026*).
-- 🤝 **Gang Affiliations**: Integrated branding natively supporting the IVC (Innovators & Visionaries Club) and VVCE crews seamlessly.
-
-## 🔫 Tech Arsenal
-
-- **Framework**: React 18
-- **Build Tool**: Vite (Lightning fast getaway driver)
-- **Styling**: Vanilla CSS3 (Custom Variables, Neon Animations, Custom Font-Faces)
-- **Icons**: Lucide React
-- **Routing**: React Router (DOM)
-
-## 🌴 The Setup (Getting Started)
-
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) (v16+ recommended) installed on your terminal.
-
-### Installation
-
-1. Clone the repository to your local safehouse:
-   ```bash
-   git clone https://github.com/DeverGuy/Vise_verse_Admin-Page-.git
-   ```
-2. Navigate into the directory:
-   ```bash
-   cd Vise_verse_Admin-Page-
-   ```
-3. Load the ammunition (dependencies):
-   ```bash
-   npm install
-   ```
-
-### Running the Streets Locally
-
-To start the development server with Hot Module Replacement (HMR):
 ```bash
 npm run dev
-```
-The syndicate dashboard will be live at `http://localhost:5173`.
-
-### Shipping the Cargo (Production)
-
-To create a production-ready bundle:
-```bash
-npm run build
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## 🎨 The Aesthetic (Design System)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The application utilizes a custom CSS variable system defined in `index.css`:
-- **Typography**: Heavily utilizes `Pricedown` (GTA Title Font) paired with `Inter` and `Chakra Petch` for UI readability.
-- **Colors**:
-  - `var(--bg-color)`: `#050508` (Deep Midnight Black)
-  - `var(--accent-primary)`: `#FBC815` (Rockstar Gold)
-  - `var(--accent-secondary)`: `#FF007F` (Neon Pink)
-  - `var(--accent-tertiary)`: `#00F0FF` (Ocean Drive Cyan)
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-<div align="center">
-  <img src="neon-divider.svg" width="100%" />
-  <img src="synthwave-sun.svg" width="150" />
-</div>
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-*Forged for the IVC Ideathon @ Vidyavardhaka College of Engineering (VVCE).*
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

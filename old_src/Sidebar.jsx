@@ -45,7 +45,6 @@ export default function Sidebar() {
           <span style={{ fontFamily: 'var(--font-family-tech)', fontSize: '1.2rem', color: 'var(--text-secondary)', fontWeight: 'bold' }}>x</span>
           <img src="vvce-logo-720x445-removebg-preview.png" alt="VVCE Logo" style={{ maxWidth: '80px', maxHeight: '80px', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(251, 200, 21, 0.3))' }} />
         </div>
-        <p className="college-name">Vidyavardhaka College of Engineering</p>
       </div>
     </aside>
   );
