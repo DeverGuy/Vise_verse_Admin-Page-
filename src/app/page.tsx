@@ -1,11 +1,21 @@
 "use client";
 
 import React, { useContext } from 'react';
-import { Users, Gavel, Zap } from 'lucide-react';
+import { Users, Gavel, Zap, LogOut } from 'lucide-react';
 import { DataContext } from '@/components/DataContext';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const { teams, judges } = useContext(DataContext);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <div className="animate-fade-in">
@@ -14,9 +24,19 @@ export default function Dashboard() {
           <h1 className="text-text-primary text-[3rem] font-heading tracking-[2px] leading-[1.1] uppercase m-0 mb-2">Vice Verse Dashboard</h1>
           <p className="text-text-secondary leading-[1.6] m-0">Welcome to the central command center for Vice Verse 1.0 2026.</p>
         </div>
-        <button className="inline-flex items-center justify-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border-none text-base bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] animate-glow">
-          <Zap size={18} /> Quick Action
-        </button>
+        
+        <div className="flex gap-4">
+          <button className="inline-flex items-center justify-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border-none text-base bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] animate-glow">
+            <Zap size={18} /> Quick Action
+          </button>
+          
+          <button 
+            onClick={handleSignOut}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border border-status-error text-status-error hover:bg-[rgba(255,0,127,0.1)] hover:shadow-[0_0_15px_rgba(255,0,127,0.4)]"
+          >
+            <LogOut size={18} /> Sign Out
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 mt-4">
