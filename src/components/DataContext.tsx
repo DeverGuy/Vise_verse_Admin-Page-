@@ -34,16 +34,16 @@ type DataContextType = {
   teams: Team[];
   judges: Judge[];
   schedule: ScheduleItem[];
-  addJudge: (judge: any) => void;
-  editJudge: (id: string, updated: any) => void;
+  addJudge: (judge: Omit<Judge, 'id'>) => void;
+  editJudge: (id: string, updated: Partial<Judge>) => void;
   deleteJudge: (id: string) => void;
   assignJudgeToTeam: (teamId: string, judgeId: string) => void;
-  addTeam: (team: any) => void;
-  editTeam: (id: string, updated: any) => void;
+  addTeam: (team: Omit<Team, 'id' | 'judgeId' | 'disqualified' | 'disqualifyReason'>) => void;
+  editTeam: (id: string, updated: Partial<Team>) => void;
   deleteTeam: (id: string) => void;
   disqualifyTeam: (id: string, reason: string) => void;
-  addScheduleItem: (item: any) => void;
-  editScheduleItem: (id: string, updated: any) => void;
+  addScheduleItem: (item: Omit<ScheduleItem, 'id'>) => void;
+  editScheduleItem: (id: string, updated: Partial<ScheduleItem>) => void;
   deleteScheduleItem: (id: string) => void;
 };
 
@@ -58,14 +58,26 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     setIsClient(true);
-    const savedTeams = localStorage.getItem('ideathon_teams_v2');
-    if (savedTeams) setTeams(JSON.parse(savedTeams));
+    try {
+      const savedTeams = localStorage.getItem('ideathon_teams_v2');
+      if (savedTeams && savedTeams !== 'undefined') setTeams(JSON.parse(savedTeams));
+    } catch {
+      // Fallback empty
+    }
 
-    const savedJudges = localStorage.getItem('ideathon_judges_v2');
-    if (savedJudges) setJudges(JSON.parse(savedJudges));
+    try {
+      const savedJudges = localStorage.getItem('ideathon_judges_v2');
+      if (savedJudges && savedJudges !== 'undefined') setJudges(JSON.parse(savedJudges));
+    } catch {
+      // Fallback empty
+    }
 
-    const savedSchedule = localStorage.getItem('ideathon_schedule_v3');
-    if (savedSchedule) setSchedule(JSON.parse(savedSchedule));
+    try {
+      const savedSchedule = localStorage.getItem('ideathon_schedule_v3');
+      if (savedSchedule && savedSchedule !== 'undefined') setSchedule(JSON.parse(savedSchedule));
+    } catch {
+      // Fallback empty
+    }
   }, []);
 
   useEffect(() => {
@@ -81,8 +93,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [schedule, isClient]);
 
   // Judge Actions
-  const addJudge = (judge: any) => setJudges(prev => [...prev, { ...judge, id: `J${Date.now()}` }]);
-  const editJudge = (id: string, updated: any) => setJudges(prev => prev.map(j => j.id === id ? { ...j, ...updated } : j));
+  const addJudge = (judge: Omit<Judge, 'id'>) => setJudges(prev => [...prev, { ...judge, id: `J${Date.now()}` }]);
+  const editJudge = (id: string, updated: Partial<Judge>) => setJudges(prev => prev.map(j => j.id === id ? { ...j, ...updated } : j));
   const deleteJudge = (id: string) => {
     setJudges(prev => prev.filter(j => j.id !== id));
     setTeams(prev => prev.map(t => t.judgeId === id ? { ...t, judgeId: null } : t));
@@ -93,11 +105,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setTeams(prev => prev.map(t => t.id === teamId ? { ...t, judgeId: judgeId === "" ? null : judgeId } : t));
   };
   
-  const addTeam = (team: any) => {
+  const addTeam = (team: Omit<Team, 'id' | 'judgeId' | 'disqualified' | 'disqualifyReason'>) => {
     setTeams(prev => [...prev, { ...team, id: `T${Date.now()}`, judgeId: null, disqualified: false, disqualifyReason: '' }]);
   };
   
-  const editTeam = (id: string, updated: any) => {
+  const editTeam = (id: string, updated: Partial<Team>) => {
     setTeams(prev => prev.map(t => t.id === id ? { ...t, ...updated } : t));
   };
   
@@ -110,8 +122,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Schedule Actions
-  const addScheduleItem = (item: any) => setSchedule(prev => [...prev, { ...item, id: `S${Date.now()}` }]);
-  const editScheduleItem = (id: string, updated: any) => setSchedule(prev => prev.map(s => s.id === id ? { ...s, ...updated } : s));
+  const addScheduleItem = (item: Omit<ScheduleItem, 'id'>) => setSchedule(prev => [...prev, { ...item, id: `S${Date.now()}` }]);
+  const editScheduleItem = (id: string, updated: Partial<ScheduleItem>) => setSchedule(prev => prev.map(s => s.id === id ? { ...s, ...updated } : s));
   const deleteScheduleItem = (id: string) => setSchedule(prev => prev.filter(s => s.id !== id));
 
   return (

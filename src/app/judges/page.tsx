@@ -1,44 +1,47 @@
 "use client";
 
-import React, { useContext, useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { Search, Plus, Edit3, Trash2, X } from 'lucide-react';
+import React, { useContext, useState } from 'react';
+import { Plus, Edit3, Trash2 } from 'lucide-react';
 import { DataContext, Judge } from '@/components/DataContext';
+import { DataTable, Column } from '@/components/admin/DataTable';
+import { StatusBadge } from '@/components/admin/StatusBadge';
+import { SearchFilterBar } from '@/components/admin/SearchFilterBar';
+import { Pagination } from '@/components/admin/Pagination';
+import { Modal } from '@/components/admin/Modal';
+import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import { TextInput } from '@/components/admin/FormControls';
 
 export default function JudgesPortal() {
   const { judges, addJudge, editJudge, deleteJudge, teams } = useContext(DataContext);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentJudge, setCurrentJudge] = useState<Judge | null>(null);
-  
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Modals state
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [editingJudge, setEditingJudge] = useState<Judge | null>(null);
   const [formData, setFormData] = useState({ name: '', email: '', specialization: '' });
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsModalOpen(false);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [judgeToDelete, setJudgeToDelete] = useState<Judge | null>(null);
 
-  const handleOpenModal = (judge: Judge | null = null) => {
+  const handleOpenFormModal = (judge: Judge | null = null) => {
     if (judge) {
-      setCurrentJudge(judge);
+      setEditingJudge(judge);
       setFormData({ name: judge.name, email: judge.email, specialization: judge.specialization });
     } else {
-      setCurrentJudge(null);
+      setEditingJudge(null);
       setFormData({ name: '', email: '', specialization: '' });
     }
-    setIsModalOpen(true);
+    setIsFormModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (currentJudge) {
-      editJudge(currentJudge.id, formData);
+    if (editingJudge) {
+      editJudge(editingJudge.id, formData);
     } else {
       addJudge({
         ...formData,
@@ -46,115 +49,213 @@ export default function JudgesPortal() {
         theme: `var(--accent-${['primary', 'secondary', 'tertiary'][Math.floor(Math.random() * 3)]})`
       });
     }
-    setIsModalOpen(false);
+    setIsFormModalOpen(false);
   };
 
-  const filteredJudges = judges.filter(j => 
-    j.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    j.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleConfirmDelete = () => {
+    if (judgeToDelete) {
+      deleteJudge(judgeToDelete.id);
+    }
+    setIsDeleteModalOpen(false);
+  };
+
+  // Filtered & Paginated List
+  const filteredJudges = judges.filter(j =>
+    j.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    j.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    j.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
-    <>
-      <div className="animate-fade-in relative">
-        <header className="flex justify-between items-start mb-6">
+  const totalPages = Math.ceil(filteredJudges.length / pageSize);
+  const paginatedJudges = filteredJudges.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const columns: Column<Judge>[] = [
+    {
+      key: 'name',
+      header: 'Judge Profile',
+      render: (j) => (
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded bg-surface-color-light border border-border-color flex items-center justify-center font-bold text-accent-primary font-tech"
+            style={{ background: `linear-gradient(135deg, ${j.theme}, var(--bg-color))` }}
+          >
+            {j.initials}
+          </div>
           <div>
-            <h1 className="text-text-primary text-[3rem] font-heading tracking-[2px] leading-[1.1] uppercase m-0 mb-2">Judges Control Portal</h1>
-            <p className="text-text-secondary leading-[1.6] m-0">Manage judging panels, scorecards, and evaluations.</p>
+            <div className="font-semibold text-text-primary">{j.name}</div>
+            <div className="text-xs text-text-secondary">{j.email}</div>
           </div>
-          <button className="inline-flex items-center justify-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border-none text-base bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] animate-glow" onClick={() => handleOpenModal()}>
-            <Plus size={18} /> Add Judge
+        </div>
+      )
+    },
+    {
+      key: 'specialization',
+      header: 'Specialization / Domain',
+      render: (j) => <span className="font-tech text-xs uppercase text-accent-tertiary">{j.specialization}</span>
+    },
+    {
+      key: 'assignedCount',
+      header: 'Assigned Teams',
+      render: (j) => {
+        const count = teams.filter(t => t.judgeId === j.id).length;
+        return (
+          <span className="font-tech text-xs text-text-primary font-bold">
+            {count} Teams Assigned
+          </span>
+        );
+      }
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: () => <StatusBadge status="Active" size="sm" />
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      render: (j) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => handleOpenFormModal(j)}
+            className="p-1.5 border border-border-color text-text-secondary hover:text-accent-primary hover:border-accent-primary transition-colors"
+            title="Edit Judge"
+          >
+            <Edit3 size={15} />
           </button>
-        </header>
-
-        <div className="bg-surface-color rounded-lg border border-border-color p-4 px-6 flex justify-between mt-4">
-          <div className="flex gap-4 items-center">
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
-              <input 
-                type="text" 
-                placeholder="Search judges..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-bg-color border border-border-color pl-10 pr-3 py-2.5 rounded-lg text-text-primary font-body w-[300px] outline-none focus:border-accent-primary transition-colors"
-              />
-            </div>
-          </div>
+          <button
+            onClick={() => {
+              setJudgeToDelete(j);
+              setIsDeleteModalOpen(true);
+            }}
+            className="p-1.5 border border-status-error/40 text-status-error hover:bg-status-error/10 transition-colors"
+            title="Remove Judge"
+          >
+            <Trash2 size={15} />
+          </button>
         </div>
+      )
+    }
+  ];
 
-        <div className="glass-panel mt-4 p-0">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="p-4 text-left border-b border-border-color text-accent-primary font-tech text-[0.9rem] uppercase tracking-[1px]">Judge Name</th>
-                <th className="p-4 text-left border-b border-border-color text-accent-primary font-tech text-[0.9rem] uppercase tracking-[1px]">Specialization</th>
-                <th className="p-4 text-left border-b border-border-color text-accent-primary font-tech text-[0.9rem] uppercase tracking-[1px]">Teams Assigned</th>
-                <th className="p-4 text-left border-b border-border-color text-accent-primary font-tech text-[0.9rem] uppercase tracking-[1px]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJudges.map(judge => {
-                const assignedCount = teams.filter(t => t.judgeId === judge.id).length;
-                return (
-                  <tr key={judge.id} className="transition-colors duration-200 hover:bg-[rgba(255,0,127,0.05)] border-b border-border-color last:border-b-0">
-                    <td className="p-4 text-left">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded flex items-center justify-center font-bold text-white" style={{ background: `linear-gradient(135deg, ${judge.theme}, var(--bg-color))` }}>
-                          {judge.initials}
-                        </div>
-                        <div>
-                          <div className="font-medium">{judge.name}</div>
-                          <div className="text-[0.8rem] text-text-secondary">{judge.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-4 text-left">{judge.specialization}</td>
-                    <td className="p-4 text-left">{assignedCount} Teams</td>
-                    <td className="p-4 text-left">
-                      <div className="flex gap-2">
-                        <button className="inline-flex items-center justify-center p-1.5 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border border-text-primary bg-transparent text-text-primary hover:bg-text-primary hover:text-black" title="Edit Details" onClick={() => handleOpenModal(judge)}><Edit3 size={16} /></button>
-                        <button className="inline-flex items-center justify-center p-1.5 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border border-status-error bg-transparent text-status-error hover:bg-status-error hover:text-white" title="Delete" onClick={() => deleteJudge(judge.id)}><Trash2 size={16} /></button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-              {filteredJudges.length === 0 && (
-                <tr className="border-b border-border-color last:border-b-0">
-                  <td colSpan={4} className="p-6 text-center text-text-secondary">No judges found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+  return (
+    <div className="animate-fade-in flex flex-col gap-6">
+      {/* Header */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-text-primary text-[2.5rem] md:text-[3rem] font-heading tracking-[2px] leading-[1.1] uppercase m-0 mb-2">
+            Judges & Panels Control
+          </h1>
+          <p className="text-text-secondary leading-[1.6] m-0">
+            Manage expert judges, evaluation panels, domain specializations, and team pairings.
+          </p>
         </div>
+        <button
+          onClick={() => handleOpenFormModal()}
+          className="inline-flex items-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border-none bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] animate-glow shrink-0"
+        >
+          <Plus size={18} /> Add Judge
+        </button>
+      </header>
+
+      {/* Filter Bar */}
+      <SearchFilterBar
+        searchTerm={searchTerm}
+        onSearchChange={(val) => {
+          setSearchTerm(val);
+          setCurrentPage(1);
+        }}
+        searchPlaceholder="Search judge name, email, or domain specialization..."
+        onResetFilters={() => {
+          setSearchTerm('');
+          setCurrentPage(1);
+        }}
+      />
+
+      {/* Main Table */}
+      <div>
+        <DataTable
+          columns={columns}
+          data={paginatedJudges}
+          keyExtractor={(j) => j.id}
+          isEmpty={filteredJudges.length === 0}
+          emptyTitle="No Judges Registered"
+          emptyDescription="No evaluation judges match your search query. Click below to add a judge."
+          emptyActionLabel="Add Judge"
+          onEmptyAction={() => handleOpenFormModal()}
+        />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          totalItems={filteredJudges.length}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(sz) => {
+            setPageSize(sz);
+            setCurrentPage(1);
+          }}
+        />
       </div>
 
-      {isModalOpen && mounted && createPortal(
-        <div className="fixed inset-0 bg-[rgba(5,5,8,0.85)] backdrop-blur-sm z-[1000] flex items-center justify-center p-6 animate-fade-in overflow-y-auto">
-          <div className="bg-surface-color border border-accent-primary rounded-xl w-full max-w-[500px] relative p-8 m-auto shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_0_1px_rgba(251,200,21,0.2),0_0_20px_rgba(251,200,21,0.1)] transform translate-y-0" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-            <button type="button" className="absolute top-4 right-4 bg-[rgba(255,255,255,0.05)] border border-border-color text-text-primary w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-status-error hover:border-status-error hover:text-white hover:rotate-90" onClick={() => setIsModalOpen(false)}>
-              <X size={18} />
+      {/* Add / Edit Judge Modal */}
+      <Modal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        title={editingJudge ? 'Edit Judge Profile' : 'Add New Judge'}
+        subtitle="Configure judge details and domain specialization."
+        headerColor="primary"
+      >
+        <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+          <TextInput
+            label="Full Name"
+            required
+            placeholder="e.g. Dr. Vikram Sarabhai"
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+          />
+          <TextInput
+            label="Email Address"
+            type="email"
+            required
+            placeholder="vikram@vvce.ac.in"
+            value={formData.email}
+            onChange={e => setFormData({ ...formData, email: e.target.value })}
+          />
+          <TextInput
+            label="Specialization / Domain"
+            required
+            placeholder="e.g. Artificial Intelligence & Cloud Architecture"
+            value={formData.specialization}
+            onChange={e => setFormData({ ...formData, specialization: e.target.value })}
+          />
+
+          <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-border-color">
+            <button
+              type="button"
+              onClick={() => setIsFormModalOpen(false)}
+              className="px-5 py-2.5 font-bold font-tech uppercase tracking-[1px] border border-border-color bg-transparent text-text-secondary hover:text-white"
+            >
+              Cancel
             </button>
-            <h2 className="mb-6 text-accent-primary font-heading tracking-[2px] leading-[1.1] uppercase m-0 text-[2.2rem]">{currentJudge ? 'Edit Judge' : 'Add Judge'}</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-[0.9rem] text-accent-primary uppercase font-tech font-bold tracking-[2px]">Name</label>
-                <input required type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="bg-[rgba(13,13,20,0.7)] border border-border-color text-white p-3 rounded outline-none focus:border-accent-primary transition-colors" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[0.9rem] text-accent-primary uppercase font-tech font-bold tracking-[2px]">Email</label>
-                <input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="bg-[rgba(13,13,20,0.7)] border border-border-color text-white p-3 rounded outline-none focus:border-accent-primary transition-colors" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[0.9rem] text-accent-primary uppercase font-tech font-bold tracking-[2px]">Specialization</label>
-                <input required type="text" value={formData.specialization} onChange={e => setFormData({...formData, specialization: e.target.value})} className="bg-[rgba(13,13,20,0.7)] border border-border-color text-white p-3 rounded outline-none focus:border-accent-primary transition-colors" />
-              </div>
-              <button type="submit" className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-3 font-bold font-tech uppercase tracking-[1px] cursor-pointer transition-all duration-200 border-none text-base bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] animate-glow">{currentJudge ? 'Update Judge' : 'Add Judge'}</button>
-            </form>
+            <button
+              type="submit"
+              className="px-6 py-2.5 font-bold font-tech uppercase tracking-[1px] bg-accent-primary text-black hover:bg-accent-primary-hover hover:shadow-[0_0_15px_rgba(251,200,21,0.4)] border-none cursor-pointer"
+            >
+              {editingJudge ? 'Update Judge' : 'Save Judge'}
+            </button>
           </div>
-        </div>,
-        document.body
-      )}
-    </>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Remove Judge"
+        message={`Are you sure you want to remove judge "${judgeToDelete?.name}"? Assigned teams will be unassigned.`}
+        variant="danger"
+      />
+    </div>
   );
 }
